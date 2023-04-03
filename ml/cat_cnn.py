@@ -81,16 +81,7 @@ class ConvNet(nn.Module):
         self.conv3 = nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1)
         self.relu3 = nn.ReLU()
         self.pool3 = nn.MaxPool2d(kernel_size=2, stride=2)
-        self.conv4 = nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=1)
-        self.relu4 = nn.ReLU()
-        self.pool4 = nn.MaxPool2d(kernel_size=2, stride=2)
-        self.conv5 = nn.Conv2d(128, 256, kernel_size=3, stride=1, padding=1)
-        self.relu5 = nn.ReLU()
-        self.pool5 = nn.MaxPool2d(kernel_size=2, stride=2)
-        self.fc1 = nn.Linear(256 * 7 * 7, 512)
-        self.relu6 = nn.ReLU()
-        self.fc2 = nn.Linear(512, 2)
-        self.softmax = nn.Softmax(dim=1)
+        self.fc = nn.Linear(64 * 28 * 28, 12)
 
     def forward(self, x):
         batch_size = x.size(0)
@@ -103,19 +94,10 @@ class ConvNet(nn.Module):
         x = self.conv3(x)
         x = self.relu3(x)
         x = self.pool3(x)
-        x = self.conv4(x)
-        x = self.relu4(x)
-        x = self.pool4(x)
-        x = self.conv5(x)
-        x = self.relu5(x)
-        x = self.pool5(x)
         x = x.view(batch_size, -1)
-        x = self.fc1(x)
-        x = self.relu6(x)
-        x = self.fc2(x)
-        x = self.softmax(x)
+        x = self.fc(x)
         return x
-
+        
 # create model(send it to device so to use gpu)
 model = ConvNet().to(device)
 
@@ -135,57 +117,7 @@ n_total_steps = len(train_loader)
 
 train_models.train(model=model,train_dataloader=train_loader,test_dataloader=test_loader,
                    optimizer=optimizer,loss_fn=loss_fn,epochs=num_epochs,device=device)
-# running_loss = 0.0
-# for i in range(num_epochs):
-#     for images, labels in train_loader:
-#         # Move the data to the device
-#         images = images.to(device)
-#         labels = labels.to(device)
 
-#         # Forward pass
-#         outputs = model(images)
-#         loss = criterion(outputs, labels)
+FILE = "cat_model.pth"
+torch.save(model.state_dict(), FILE)
 
-#         # Backward and optimize
-#         optimizer.zero_grad()
-#         loss.backward()
-#         optimizer.step()
-
-#     # print statistics
-#     running_loss += loss.item()
-    
-#     print(f'[number of epochs: {num_epochs}, current epoch: {i+1}] loss: {running_loss}')
-#     running_loss = 0.0    
-# print('finished training')
-
-# FILE = "cat_model.pth"
-# torch.save(model.state_dict(), FILE)
-
-# # evaluation
-# with torch.no_grad():
-#     n_correct = 0
-#     n_samples = 0
-#     n_class_correct = [0 for i in range(12)]
-#     n_class_samples = [0 for i in range(12)]
-#     for images, labels in test_loader:
-#         images = images.to(device)
-#         labels = labels.to(device)
-#         outputs = model(images)
-
-#         # max returns
-#         _, predicted = torch.max(outputs, 1)
-#         n_samples += labels.size(0)
-#         n_correct += (predicted == labels).sum().item()
-
-#         for i in range(batch_size_training):
-#             label = labels[i]
-#             pred = predicted[i]
-#             if (label == pred):
-#                 n_class_correct[label] += 1
-#             n_class_samples[label] += 1
-#     acc = 100.0 * n_correct / n_samples
-#     print(f'accuracy of the network: {acc}%')
-
-#     for i in range(12):
-#         acc = 100.0 * n_class_correct[i] / n_class_samples[i]
-#         print(f'accuracy of {CATEGORIES[i]}: {acc}%')

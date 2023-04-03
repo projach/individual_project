@@ -21,7 +21,7 @@ async def prediction(file: UploadFile = File(...), algorithm: str = Query(...)):
     print(algorithm)
     img = Image.open(file.file)
     labels, probs = predicting_cat.transfer_learning_find_breed(
-        img=img, model=algorithm)
+        img=img, model_str=algorithm)
     values = {
         "first_prediction": f"{labels[0]}",
         "second_prediction": f"{labels[1]}",
