@@ -4,12 +4,14 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torchvision
 import torchvision.transforms as transforms
+import train_models
 from torch.utils.data import Dataset
 from sklearn.datasets import make_classification
 from torch.utils.data import DataLoader, TensorDataset
 from torch import Tensor
 from torchvision.datasets import ImageFolder
 from torch.utils.data import Subset
+from torchinfo import summary
 
 # device configuration to use gpu if there is cuda available
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
@@ -22,7 +24,7 @@ learning_rate = 0.001
 num_train_images_per_label = 144
 num_eval_images_per_label = 50
 
-data_dir = "D:\study_ml\data_images_v2\cat_breeds"
+data_dir = "D:\individual_project\data_images_v2\cat_breeds"
 
 # Define the transformations you want to apply to your images
 transform = transforms.Compose([
@@ -70,92 +72,120 @@ CATEGORIES = ["Abyssinian", "Bengal", "Birman", "Bombay", "British_Shorthair",
 class ConvNet(nn.Module):
     def __init__(self):
         super(ConvNet, self).__init__()
-        self.conv1 = nn.Conv2d(3, 6, 5)
-        self.pool = nn.MaxPool2d(2, 2)
-        self.conv2 = nn.Conv2d(6, 16, 5)
-        self.conv3 = nn.Conv2d(16, 32, 3)
-        self.conv4 = nn.Conv2d(32, 64, 3)
-        self.conv5 = nn.Conv2d(64, 128, 3)
-        self.fc1 = nn.Linear(128*13*13, 120)
-        self.fc2 = nn.Linear(120, 84)
-        self.fc3 = nn.Linear(84, 12)
-        self.flatten = nn.Flatten()
+        self.conv1 = nn.Conv2d(3, 16, kernel_size=3, stride=1, padding=1)
+        self.relu1 = nn.ReLU()
+        self.pool1 = nn.MaxPool2d(kernel_size=2, stride=2)
+        self.conv2 = nn.Conv2d(16, 32, kernel_size=3, stride=1, padding=1)
+        self.relu2 = nn.ReLU()
+        self.pool2 = nn.MaxPool2d(kernel_size=2, stride=2)
+        self.conv3 = nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1)
+        self.relu3 = nn.ReLU()
+        self.pool3 = nn.MaxPool2d(kernel_size=2, stride=2)
+        self.conv4 = nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=1)
+        self.relu4 = nn.ReLU()
+        self.pool4 = nn.MaxPool2d(kernel_size=2, stride=2)
+        self.conv5 = nn.Conv2d(128, 256, kernel_size=3, stride=1, padding=1)
+        self.relu5 = nn.ReLU()
+        self.pool5 = nn.MaxPool2d(kernel_size=2, stride=2)
+        self.fc1 = nn.Linear(256 * 7 * 7, 512)
+        self.relu6 = nn.ReLU()
+        self.fc2 = nn.Linear(512, 2)
+        self.softmax = nn.Softmax(dim=1)
 
     def forward(self, x):
-        x = self.pool(F.relu(self.conv1(x)))
-        x = self.pool(F.relu(self.conv2(x)))
-        x = F.relu(self.conv3(x))
-        x = F.relu(self.conv4(x))
-        x = F.relu(self.conv5(x))
-        x = self.flatten(x)
-        x = F.relu(self.fc1(x))
-        x = F.relu(self.fc2(x))
-        x = self.fc3(x)
+        batch_size = x.size(0)
+        x = self.conv1(x)
+        x = self.relu1(x)
+        x = self.pool1(x)
+        x = self.conv2(x)
+        x = self.relu2(x)
+        x = self.pool2(x)
+        x = self.conv3(x)
+        x = self.relu3(x)
+        x = self.pool3(x)
+        x = self.conv4(x)
+        x = self.relu4(x)
+        x = self.pool4(x)
+        x = self.conv5(x)
+        x = self.relu5(x)
+        x = self.pool5(x)
+        x = x.view(batch_size, -1)
+        x = self.fc1(x)
+        x = self.relu6(x)
+        x = self.fc2(x)
+        x = self.softmax(x)
         return x
-
 
 # create model(send it to device so to use gpu)
 model = ConvNet().to(device)
 
+# summary(model = model,
+#         input_size=(batch_size_testing, 3, 224, 224),
+#         col_names=["input_size", "output_size", "num_params", "trainable"],
+#         col_width=20,
+#         row_settings=["var_names"]
+# )
+
 # using cross entropyLoss because is a multy class classification
-criterion = nn.CrossEntropyLoss()
+loss_fn = nn.CrossEntropyLoss()
 # optimizing model parameters using SGD
 optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
 
 n_total_steps = len(train_loader)
 
-running_loss = 0.0
-for i in range(num_epochs):
-    for images, labels in train_loader:
-        # Move the data to the device
-        images = images.to(device)
-        labels = labels.to(device)
+train_models.train(model=model,train_dataloader=train_loader,test_dataloader=test_loader,
+                   optimizer=optimizer,loss_fn=loss_fn,epochs=num_epochs,device=device)
+# running_loss = 0.0
+# for i in range(num_epochs):
+#     for images, labels in train_loader:
+#         # Move the data to the device
+#         images = images.to(device)
+#         labels = labels.to(device)
 
-        # Forward pass
-        outputs = model(images)
-        loss = criterion(outputs, labels)
+#         # Forward pass
+#         outputs = model(images)
+#         loss = criterion(outputs, labels)
 
-        # Backward and optimize
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
+#         # Backward and optimize
+#         optimizer.zero_grad()
+#         loss.backward()
+#         optimizer.step()
 
-    # print statistics
-    running_loss += loss.item()
-    if i % 10 == 9:    # print every 10 mini-batches
-        print('[%d, %5d] loss: %.3f' %
-              (num_epochs + 1, i + 1, running_loss / 10))
-        running_loss = 0.0
-print('finished training')
+#     # print statistics
+#     running_loss += loss.item()
+    
+#     print(f'[number of epochs: {num_epochs}, current epoch: {i+1}] loss: {running_loss}')
+#     running_loss = 0.0    
+# print('finished training')
 
-FILE = "cat_model.pth"
-torch.save(model.state_dict(), FILE)
+# FILE = "cat_model.pth"
+# torch.save(model.state_dict(), FILE)
 
-# evaluation
-with torch.no_grad():
-    n_correct = 0
-    n_samples = 0
-    n_class_correct = [0 for i in range(12)]
-    n_class_samples = [0 for i in range(12)]
-    for images, labels in test_loader:
-        images = images.to(device)
-        labels = labels.to(device)
-        outputs = model(images)
+# # evaluation
+# with torch.no_grad():
+#     n_correct = 0
+#     n_samples = 0
+#     n_class_correct = [0 for i in range(12)]
+#     n_class_samples = [0 for i in range(12)]
+#     for images, labels in test_loader:
+#         images = images.to(device)
+#         labels = labels.to(device)
+#         outputs = model(images)
 
-        # max returns
-        _, predicted = torch.max(outputs, 1)
-        n_samples += labels.size(0)
-        n_correct += (predicted == labels).sum().item()
+#         # max returns
+#         _, predicted = torch.max(outputs, 1)
+#         n_samples += labels.size(0)
+#         n_correct += (predicted == labels).sum().item()
 
-        for i in range(batch_size_training):
-            label = labels[i]
-            pred = predicted[i]
-            if (label == pred):
-                n_class_correct[label] += 1
-            n_class_samples[label] += 1
-    acc = 100.0 * n_correct / n_samples
-    print(f'accuracy of the network: {acc}%')
+#         for i in range(batch_size_training):
+#             label = labels[i]
+#             pred = predicted[i]
+#             if (label == pred):
+#                 n_class_correct[label] += 1
+#             n_class_samples[label] += 1
+#     acc = 100.0 * n_correct / n_samples
+#     print(f'accuracy of the network: {acc}%')
 
-    for i in range(12):
-        acc = 100.0 * n_class_correct[i] / n_class_samples[i]
-        print(f'accuracy of {CATEGORIES[i]}: {acc}%')
+#     for i in range(12):
+#         acc = 100.0 * n_class_correct[i] / n_class_samples[i]
+#         print(f'accuracy of {CATEGORIES[i]}: {acc}%')
