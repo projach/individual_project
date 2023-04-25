@@ -14,7 +14,7 @@ st.set_page_config(page_title="Cat breed classification",
 
 # label of page
 with st.container():
-    st.markdown("<h2 style='text-align: center; padding-top: 0px; margin-top: 0px;'>This is a dissertation project that classifies cat breeds with machine learning</h2>",
+    st.markdown("<h2 style='text-align: center; padding-top: 0px; margin-top: 0px;'>Individual project that classifies cat breeds with machine learning</h2>",
                 unsafe_allow_html=True)
 
 # body of page
@@ -27,6 +27,8 @@ with st.container():
     # creating the left column of page
     with left_column:
         # Here write a litle bit about the site
+        st.markdown(f"<h4 style='text-align: center; padding-top: 0px; margin-top: 0px;'>hi</h4>",
+                unsafe_allow_html=True)
         # a select box that the user can choose between 2 algorithms
         algorithm_option = st.selectbox(
             'Select the algorithm you want to use',
@@ -40,15 +42,12 @@ with st.container():
             'Upload a png or a jpg photo of a cat', type=['png', 'jpg'])
         start = holder_button.button("press when you are ready")
         if start:
-            holder_button.empty()
-            holder_photo.empty()
             if cat_photo is not None:
                 image = Image.open(cat_photo)
                 st.image(image, width=300)
                 try:
                     files = {"file": cat_photo.getvalue()}
                     data = {"algorithm": algorithm_option}
-                    print(algorithm_option)
                     res = requests.post(
                         url="http://127.0.0.1:8000/prediction?algorithm=" + algorithm_option, files=files)
                     if res.ok:
