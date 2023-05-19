@@ -1,5 +1,6 @@
 import requests
 import streamlit as st
+import webbrowser
 from PIL import Image
 
 # breeds
@@ -30,14 +31,19 @@ with st.container():
     # creating the left column of page
     with left_column:
         # Here write a litle bit about the site
-        st.markdown(f"<h4 style='text-align: center; padding-top: 0px; margin-top: 0px;'>This application can predict 12 cat breeds</h4>",
+        st.markdown(f"<h4 style='text-align: center; padding-top: 0px; margin-top: 0px;'>These models can predict 12 cat breeds</h4>",
                     unsafe_allow_html=True)
-        st.markdown(f"<h4 style='text-align: center; padding-top: 0px; margin-top: 0px;'>The 12 cat breeds that can be recognized are: {', '.join(CATEGORIES)}</h4>",
+        st.markdown(f"<h4 style='text-align: center; padding-top: 0px; margin-top: 0px;'>The 12 cat breeds that can be predicted by the model are: {', '.join(CATEGORIES)}</h4>",
                     unsafe_allow_html=True)
+        
         # a select box that the user can choose between 2 algorithms
         algorithm_option = st.selectbox(
             'Select the algorithm you want to use',
             ('Transfer Learning(resnet50)', 'My Model'))
+        
+        # more info about the project redirecting to the github of the project
+        if st.button('Project info'):
+            webbrowser.open_new_tab('https://github.com/projach/individual_project')
 
     # creating right column
     with right_column:
