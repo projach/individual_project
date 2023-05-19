@@ -2,6 +2,9 @@ import requests
 import streamlit as st
 from PIL import Image
 
+# breeds
+CATEGORIES = ["Abyssinian", "Bengal", "Birman", "Bombay", "British_Shorthair",
+              "Egyptian_Mau", "Maine_Coon", "Persian", "Ragdoll", "Russian_Blue", "Siamese", "Sphynx"]
 
 # initialize text
 first_prediction = "First prediction"
@@ -27,8 +30,10 @@ with st.container():
     # creating the left column of page
     with left_column:
         # Here write a litle bit about the site
-        st.markdown(f"<h4 style='text-align: center; padding-top: 0px; margin-top: 0px;'>hi</h4>",
-                unsafe_allow_html=True)
+        st.markdown(f"<h4 style='text-align: center; padding-top: 0px; margin-top: 0px;'>This application can predict 12 cat breeds</h4>",
+                    unsafe_allow_html=True)
+        st.markdown(f"<h4 style='text-align: center; padding-top: 0px; margin-top: 0px;'>The 12 cat breeds that can be recognized are: {', '.join(CATEGORIES)}</h4>",
+                    unsafe_allow_html=True)
         # a select box that the user can choose between 2 algorithms
         algorithm_option = st.selectbox(
             'Select the algorithm you want to use',
