@@ -70,6 +70,8 @@ with st.container():
                         st.write("Some error occured")
                 except ConnectionError as e:
                     st.write("Couldn't reach backend")
+            else:
+                st.write("You need to upload a photo of a cat to get a prediction!")
 
         st.markdown(f"<h3 style='text-align: left;'>First prediction: {first_prediction}</h3>",
                     unsafe_allow_html=True)
