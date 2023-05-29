@@ -23,12 +23,15 @@ def train(model: torch.nn.Module,
     model.to(device)
 
     # Loop through training and testing steps for a number of epochs
+    # Use tqdm to get a progress bar
     for epoch in tqdm(range(epochs)):
+        # Call the training function
         train_loss, train_acc = train_step(model=model,
                                            dataloader=train_dataloader,
                                            loss_fn=loss_fn,
                                            optimizer=optimizer,
                                            device=device)
+        # Call the evaluation function
         test_loss, test_acc = test_step(model=model,
                                         dataloader=test_dataloader,
                                         loss_fn=loss_fn,
@@ -108,7 +111,7 @@ def test_step(model: torch.nn.Module,
     with torch.inference_mode():
         # Loop through DataLoader batches
         for batch, (X, y) in enumerate(dataloader):
-            # Send data to target device
+            # Send data to device for gpu utilization
             X, y = X.to(device), y.to(device)
 
             # 1. Forward pass

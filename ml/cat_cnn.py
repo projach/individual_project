@@ -17,7 +17,7 @@ from torchinfo import summary
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 # hyper parameters
-num_epochs = 30
+num_epochs = 50
 batch_size_training = 48
 batch_size_testing = 25
 learning_rate = 0.001
@@ -118,6 +118,6 @@ n_total_steps = len(train_loader)
 train_models.train(model=model,train_dataloader=train_loader,test_dataloader=test_loader,
                    optimizer=optimizer,loss_fn=loss_fn,epochs=num_epochs,device=device)
 
-FILE = "cat_model.pth"
-torch.save(model.state_dict(), FILE)
+# FILE = "cat_model.pth"
+# torch.save(model.state_dict(), FILE)
 

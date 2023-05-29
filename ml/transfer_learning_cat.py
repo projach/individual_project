@@ -21,7 +21,8 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 # Parameters
 batch_size_training = 48
 batch_size_testing = 25
-
+epochs = 50
+lr = 0.01
 
 num_train_images_per_label = 144
 num_eval_images_per_label = 50
@@ -59,7 +60,7 @@ train_dataset = Subset(dataset, train_indices)
 eval_dataset = Subset(dataset, eval_indices)
 print(
     f'len of training: {len(train_dataset)} len of eval: {len(eval_dataset)}')
-# Create a data loader for your dataset
+# Create a data loader for dataset
 train_loader = DataLoader(
     train_dataset, batch_size=batch_size_training, shuffle=True)
 test_loader = DataLoader(
@@ -70,6 +71,7 @@ test_loader = DataLoader(
 CATEGORIES = ["Abyssinian", "Bengal", "Birman", "Bombay", "British_Shorthair",
               "Egyptian_Mau", "Maine_Coon", "Persian", "Ragdoll", "Russian_Blue", "Siamese", "Sphynx"]
 
+# load the resnet-50 model
 weights = torchvision.models.ResNet50_Weights.DEFAULT
 model = torchvision.models.resnet50(weights=weights).to(device)
 
@@ -77,17 +79,24 @@ model = torchvision.models.resnet50(weights=weights).to(device)
 for param in model.parameters():
     param.requires_grad = False
 
+# Change the last layer to output 12 features from 1000 initialy
 model.fc = torch.nn.Linear(in_features=2048, out_features=12, bias=True)
+
 # unfreeze layers
 for param in model.parameters():
     param.requires_grad = True
 
+# Add the loss function
 loss_fn = nn.CrossEntropyLoss()
-optimizer = torch.optim.SGD(model.parameters(), lr=0.01, momentum=False)
+
+# Add optimizer
+# optimizer = torch.optim.SGD(model.parameters(), lr=0.01, momentum=False)
+optimizer = torch.optim.SGD(model.parameters(), lr=0.01, momentum=True)
 # optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
+# this is used to summarize the model architecture
 # summary(model = model,
-#         input_size=(32, 3, 224, 224), # make sure this is "input_size", not "input_shape" (batch_size, color_channels, height, width)
+#         input_size=(48, 3, 224, 224), # make sure this is "input_size", not "input_shape" (batch_size, color_channels, height, width)
 #         col_names=["input_size", "output_size", "num_params", "trainable"],
 #         col_width=20,
 #         row_settings=["var_names"]
@@ -96,13 +105,13 @@ optimizer = torch.optim.SGD(model.parameters(), lr=0.01, momentum=False)
 # Start the timer
 start_time = timer()
 
-# Setup training and save the results
+# Setup training
 train_models.train(model=model,
                 train_dataloader=train_loader,
                 test_dataloader=test_loader,
                 optimizer=optimizer,
                 loss_fn=loss_fn,
-                epochs=1,
+                epochs=epochs,
                 device=device)
 
 # End the timer and print out how long it took

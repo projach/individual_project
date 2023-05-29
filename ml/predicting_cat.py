@@ -13,22 +13,22 @@ CATEGORIES = ["Abyssinian", "Bengal", "Birman", "Bombay", "British_Shorthair",
               "Egyptian_Mau", "Maine_Coon", "Persian", "Ragdoll", "Russian_Blue", "Siamese", "Sphynx"]
 
 
-# 1. Take in a trained model, class names, image path, image size, a transform and target device
-# add model number and whatever comes
+# add the image the model number the image size is added automaticaly a transformer
+# is added into the code and the device to go into gpu
 def transfer_learning_find_breed(img: Image,
                                  model_str: str,
                                  image_size: Tuple[int, int] = (224, 224),
                                  transform: torchvision.transforms = None,
                                  device: torch.device = device):
 
-    # model
+    # models used
     if model_str == "Transfer Learning(resnet50)":
         weights = torchvision.models.ResNet50_Weights.DEFAULT
         model = torchvision.models.resnet50(weights=weights)
         model.fc = nn.Linear(model.fc.in_features, len(CATEGORIES))
         model.load_state_dict(torch.load(
             "D:/individual_project/ml/transfer_model.pth"))
-        
+
     elif model_str == "My Model":
         class ConvNet(nn.Module):
             def __init__(self):
@@ -66,38 +66,34 @@ def transfer_learning_find_breed(img: Image,
         model.load_state_dict(torch.load(
             "D:/individual_project/ml/cat_model.pth"))
 
-    # 3. Create transformation for image (if one doesn't exist)
+    # transform the image for the correct image input into the model
     if transform is not None:
         image_transform = transform
     else:
         image_transform = transforms.Compose([
             transforms.Resize(image_size),
             transforms.ToTensor(),
-            # transforms.Normalize(mean=[0.485, 0.456, 0.406],
-            #                      std=[0.229, 0.224, 0.225]),
         ])
 
-    ### Predict on image ###
+    ### Predict image ###
 
-    # 4. Make sure the model is on the target device
+    # send model to gpu
     model.to(device)
 
-    # 5. Turn on model evaluation mode and inference mode
+    # Turn on model evaluation mode and inference mode
     model.eval()
     with torch.inference_mode():
-        # 6. Transform and add an extra dimension to image (model requires samples in [batch_size, color_channels, height, width])
+        # Transform and add an extra dimension to image (model requires samples in [batch_size, color_channels, height, width])
         transformed_image = image_transform(img).unsqueeze(dim=0)
 
-        # 7. Make a prediction on image with an extra dimension and send it to the target device
+        # Make a prediction on image with an extra dimension and send it to the target device
         target_image_pred = model(transformed_image.to(device))
 
-    # 8. Convert logits -> prediction probabilities (using torch.softmax() for multi-class classification)
+    # get probabilities from 0-1
     target_image_pred_probs = torch.softmax(target_image_pred, dim=1)
-
     target_image_pred_probs_softmax = F.softmax(target_image_pred_probs, dim=1)
-    # 9. Convert prediction probabilities -> prediction labels
-    # target_image_pred_label = torch.argmax(target_image_pred_probs, dim=1)
-    # target_image_pred_label = torch.topk(target_image_pred_probs, 3, dim=1)
+
+    # Convert prediction probabilities -> prediction labels and get the top 3 labels
     top3_prob, top3_label = torch.topk(target_image_pred_probs_softmax, 3)
 
     # transform to numpy array
@@ -110,6 +106,3 @@ def transfer_learning_find_breed(img: Image,
         labels.append(CATEGORIES[i])
 
     return labels, top3_prob_num
-
-
-# print(pred_and_plot_image(image_path="D:\study_ml\ml\Bombay_1.jpg"))

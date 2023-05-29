@@ -2,8 +2,6 @@ import os
 import shutil
 
 # this is used to take the last number underscore and .jpg out from the string
-
-
 def breed(st):
     # Find the indices of the first and second underscore
     basename, extension = os.path.splitext(os.path.basename(st))
