@@ -3,4 +3,4 @@ first_models/data/
 first_models/sifar_data/
 data_images_v2/cat_breeds
 ml/transfer_model.pth
-ml/cat_model.pth
+ml/cnn_model.pth

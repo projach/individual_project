@@ -111,13 +111,14 @@ model = ConvNet().to(device)
 # using cross entropyLoss because is a multy class classification
 loss_fn = nn.CrossEntropyLoss()
 # optimizing model parameters using SGD
-optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
+optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+# optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate, momentum= True)
 
 n_total_steps = len(train_loader)
 
 train_models.train(model=model,train_dataloader=train_loader,test_dataloader=test_loader,
                    optimizer=optimizer,loss_fn=loss_fn,epochs=num_epochs,device=device)
 
-# FILE = "cat_model.pth"
-# torch.save(model.state_dict(), FILE)
+FILE = "cnn_model.pth"
+torch.save(model.state_dict(), FILE)
 

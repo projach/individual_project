@@ -91,7 +91,7 @@ loss_fn = nn.CrossEntropyLoss()
 
 # Add optimizer
 # optimizer = torch.optim.SGD(model.parameters(), lr=0.01, momentum=False)
-optimizer = torch.optim.SGD(model.parameters(), lr=0.01, momentum=True)
+optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=True)
 # optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
 # this is used to summarize the model architecture

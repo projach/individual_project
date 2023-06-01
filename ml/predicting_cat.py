@@ -12,6 +12,8 @@ device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
 CATEGORIES = ["Abyssinian", "Bengal", "Birman", "Bombay", "British_Shorthair",
               "Egyptian_Mau", "Maine_Coon", "Persian", "Ragdoll", "Russian_Blue", "Siamese", "Sphynx"]
 
+TransferLearningPath = "D:/individual_project/ml/transfer_model.pth"
+CNNLearningPath = "D:/individual_project/ml/cnn_model.pth"
 
 # add the image the model number the image size is added automaticaly a transformer
 # is added into the code and the device to go into gpu
@@ -27,7 +29,7 @@ def transfer_learning_find_breed(img: Image,
         model = torchvision.models.resnet50(weights=weights)
         model.fc = nn.Linear(model.fc.in_features, len(CATEGORIES))
         model.load_state_dict(torch.load(
-            "D:/individual_project/ml/transfer_model.pth"))
+            TransferLearningPath))
 
     elif model_str == "My Model":
         class ConvNet(nn.Module):
@@ -64,7 +66,7 @@ def transfer_learning_find_breed(img: Image,
         model = ConvNet()
         model.fc = nn.Linear(model.fc.in_features, len(CATEGORIES))
         model.load_state_dict(torch.load(
-            "D:/individual_project/ml/cat_model.pth"))
+            CNNLearningPath))
 
     # transform the image for the correct image input into the model
     if transform is not None:
