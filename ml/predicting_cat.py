@@ -7,16 +7,21 @@ from PIL import Image
 from torch import nn
 from torchvision import transforms
 
+# to use gpu
 device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
 
+# breeds that can be recognized by model
 CATEGORIES = ["Abyssinian", "Bengal", "Birman", "Bombay", "British_Shorthair",
               "Egyptian_Mau", "Maine_Coon", "Persian", "Ragdoll", "Russian_Blue", "Siamese", "Sphynx"]
 
+# states of models path
 TransferLearningPath = "D:/individual_project/ml/transfer_model.pth"
 CNNLearningPath = "D:/individual_project/ml/cnn_model.pth"
 
 # add the image the model number the image size is added automaticaly a transformer
 # is added into the code and the device to go into gpu
+
+
 def transfer_learning_find_breed(img: Image,
                                  model_str: str,
                                  image_size: Tuple[int, int] = (224, 224),
@@ -98,7 +103,7 @@ def transfer_learning_find_breed(img: Image,
     # Convert prediction probabilities -> prediction labels and get the top 3 labels
     top3_prob, top3_label = torch.topk(target_image_pred_probs_softmax, 3)
 
-    # transform to numpy array
+    # transform to numpy array (we need to return to cpu to do that)
     top3_label_num = numpy.reshape(top3_label.cpu().numpy(), -1)
     top3_prob_num = numpy.reshape(top3_prob.cpu().numpy(), -1)
 

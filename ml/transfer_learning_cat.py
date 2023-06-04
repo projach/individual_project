@@ -27,9 +27,10 @@ lr = 0.01
 num_train_images_per_label = 144
 num_eval_images_per_label = 50
 
+# where the dataset is
 data_dir = "D:\individual_project\data_images_v2\cat_breeds"
 
-# Define the transformations you want to apply to your images
+# Define the transformations we want for our images
 transform = transforms.Compose([
     transforms.Resize((224, 224)),  # Resize the images to 224x224 pixels
     transforms.ToTensor(),  # Convert the images to PyTorch tensors
@@ -71,7 +72,7 @@ test_loader = DataLoader(
 CATEGORIES = ["Abyssinian", "Bengal", "Birman", "Bombay", "British_Shorthair",
               "Egyptian_Mau", "Maine_Coon", "Persian", "Ragdoll", "Russian_Blue", "Siamese", "Sphynx"]
 
-# load the resnet-50 model
+# load the resnet-50 model with its weights
 weights = torchvision.models.ResNet50_Weights.DEFAULT
 model = torchvision.models.resnet50(weights=weights).to(device)
 
@@ -105,19 +106,19 @@ optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=True)
 # Start the timer
 start_time = timer()
 
-# Setup training
+# Do the training loop
 train_models.train(model=model,
-                train_dataloader=train_loader,
-                test_dataloader=test_loader,
-                optimizer=optimizer,
-                loss_fn=loss_fn,
-                epochs=epochs,
-                device=device)
+                   train_dataloader=train_loader,
+                   test_dataloader=test_loader,
+                   optimizer=optimizer,
+                   loss_fn=loss_fn,
+                   epochs=epochs,
+                   device=device)
 
 # End the timer and print out how long it took
 end_time = timer()
 print(f"[INFO] Total training time: {end_time-start_time:.3f} seconds")
 
-# save model
-# FILE = "transfer_model.pth"
-# torch.save(model.state_dict(), FILE)
+# save the state of the model
+FILE = "transfer_model.pth"
+torch.save(model.state_dict(), FILE)

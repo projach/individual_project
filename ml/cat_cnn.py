@@ -21,9 +21,11 @@ num_epochs = 50
 batch_size_training = 48
 batch_size_testing = 25
 learning_rate = 0.001
+
 num_train_images_per_label = 144
 num_eval_images_per_label = 50
 
+# where are the data we use
 data_dir = "D:\individual_project\data_images_v2\cat_breeds"
 
 # Define the transformations you want to apply to your images
@@ -68,7 +70,7 @@ test_loader = DataLoader(
 CATEGORIES = ["Abyssinian", "Bengal", "Birman", "Bombay", "British_Shorthair",
               "Egyptian_Mau", "Maine_Coon", "Persian", "Ragdoll", "Russian_Blue", "Siamese", "Sphynx"]
 
-
+# declare the actual model
 class ConvNet(nn.Module):
     def __init__(self):
         super(ConvNet, self).__init__()
@@ -97,10 +99,12 @@ class ConvNet(nn.Module):
         x = x.view(batch_size, -1)
         x = self.fc(x)
         return x
-        
+
+
 # create model(send it to device so to use gpu)
 model = ConvNet().to(device)
 
+# if we want to see the stracture of the model
 # summary(model = model,
 #         input_size=(batch_size_testing, 3, 224, 224),
 #         col_names=["input_size", "output_size", "num_params", "trainable"],
@@ -110,15 +114,17 @@ model = ConvNet().to(device)
 
 # using cross entropyLoss because is a multy class classification
 loss_fn = nn.CrossEntropyLoss()
-# optimizing model parameters using SGD
+# optimizing model parameters using Adam
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
-# optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate, momentum= True)
+# optimizer = torch.optim.SGD(
+#     model.parameters(), lr=learning_rate, momentum=True)
 
 n_total_steps = len(train_loader)
 
-train_models.train(model=model,train_dataloader=train_loader,test_dataloader=test_loader,
-                   optimizer=optimizer,loss_fn=loss_fn,epochs=num_epochs,device=device)
+# do the training loop
+train_models.train(model=model, train_dataloader=train_loader, test_dataloader=test_loader,
+                   optimizer=optimizer, loss_fn=loss_fn, epochs=num_epochs, device=device)
 
+# save the state of the model
 FILE = "cnn_model.pth"
 torch.save(model.state_dict(), FILE)
-

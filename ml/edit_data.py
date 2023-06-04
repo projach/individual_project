@@ -12,7 +12,7 @@ def breed(st):
 
 
 # where the images where initialy
-DIR = "D:\study_ml\data_images_v2\images"
+DIR = "D:\study_ml\data_images\images"
 # where i wanted the images to go
 DEST = "D:\study_ml\data_images_v2\cat_breeds"
 

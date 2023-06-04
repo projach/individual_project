@@ -49,13 +49,20 @@ with st.container():
     with right_column:
         holder_photo = st.empty()
         holder_button = st.empty()
+        # image upload widget
         cat_photo = holder_photo.file_uploader(
             'Upload a png or a jpg photo of a cat', type=['png', 'jpg'])
+        # button for prediction
         start = holder_button.button("press when you are ready")
+        # if the button is pressed
         if start:
+            # if the image is not empty
             if cat_photo is not None:
+                # open the image
                 image = Image.open(cat_photo)
+                # show the image uploaded
                 st.image(image, width=300)
+                # try the backend call
                 try:
                     files = {"file": cat_photo.getvalue()}
                     data = {"algorithm": algorithm_option}
