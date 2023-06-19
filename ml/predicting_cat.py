@@ -15,8 +15,8 @@ CATEGORIES = ["Abyssinian", "Bengal", "Birman", "Bombay", "British_Shorthair",
               "Egyptian_Mau", "Maine_Coon", "Persian", "Ragdoll", "Russian_Blue", "Siamese", "Sphynx"]
 
 # states of models path
-TransferLearningPath = "D:/individual_project/ml/transfer_model.pth"
-CNNLearningPath = "D:/individual_project/ml/cnn_model.pth"
+TransferLearningPath = "/transfer_model.pth"
+CNNLearningPath = "/cnn_model.pth"
 
 # add the image the model number the image size is added automaticaly a transformer
 # is added into the code and the device to go into gpu
@@ -89,6 +89,7 @@ def transfer_learning_find_breed(img: Image,
 
     # Turn on model evaluation mode and inference mode
     model.eval()
+    # same as no_grad
     with torch.inference_mode():
         # Transform and add an extra dimension to image (model requires samples in [batch_size, color_channels, height, width])
         transformed_image = image_transform(img).unsqueeze(dim=0)

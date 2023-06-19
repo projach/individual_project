@@ -28,7 +28,7 @@ num_train_images_per_label = 144
 num_eval_images_per_label = 50
 
 # where the dataset is
-data_dir = "D:\individual_project\data_images_v2\cat_breeds"
+data_dir = "..\data_images_v2\cat_breeds"
 
 # Define the transformations we want for our images
 transform = transforms.Compose([

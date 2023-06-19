@@ -26,7 +26,7 @@ num_train_images_per_label = 144
 num_eval_images_per_label = 50
 
 # where are the data we use
-data_dir = "D:\individual_project\data_images_v2\cat_breeds"
+data_dir = "..\data_images_v2\cat_breeds"
 
 # Define the transformations you want to apply to your images
 transform = transforms.Compose([
@@ -54,12 +54,12 @@ for label, indices in label_indices.items():
     unused_indices = [idx for idx in indices if idx not in train_indices]
     eval_indices += random.sample(unused_indices, num_eval_images_per_label)
 
-# Create Subsets of your original dataset using the training and evaluation indices
+# Create Subsets of original dataset using the training and evaluation indices
 train_dataset = Subset(dataset, train_indices)
 eval_dataset = Subset(dataset, eval_indices)
 print(
     f'len of training: {len(train_dataset)} len of eval: {len(eval_dataset)}')
-# Create a data loader for your dataset
+# Create a data loader for dataset
 train_loader = DataLoader(
     train_dataset, batch_size=batch_size_training, shuffle=True)
 test_loader = DataLoader(
@@ -74,6 +74,7 @@ CATEGORIES = ["Abyssinian", "Bengal", "Birman", "Bombay", "British_Shorthair",
 class ConvNet(nn.Module):
     def __init__(self):
         super(ConvNet, self).__init__()
+        # starts with a 3 in conv2d as the images are rgb
         self.conv1 = nn.Conv2d(3, 16, kernel_size=3, stride=1, padding=1)
         self.relu1 = nn.ReLU()
         self.pool1 = nn.MaxPool2d(kernel_size=2, stride=2)
@@ -83,6 +84,7 @@ class ConvNet(nn.Module):
         self.conv3 = nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1)
         self.relu3 = nn.ReLU()
         self.pool3 = nn.MaxPool2d(kernel_size=2, stride=2)
+        # 64 is from the last conv and 28*28 is the size of the images
         self.fc = nn.Linear(64 * 28 * 28, 12)
 
     def forward(self, x):

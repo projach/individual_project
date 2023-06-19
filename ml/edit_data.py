@@ -12,9 +12,9 @@ def breed(st):
 
 
 # where the images where initialy
-DIR = "D:\study_ml\data_images\images"
+DIR = "..\data_images\images"
 # where i wanted the images to go
-DEST = "D:\study_ml\data_images_v2\cat_breeds"
+DEST = "..\data_images_v2\cat_breeds"
 
 # check if the dir we want exist
 if os.path.exists(DIR):
